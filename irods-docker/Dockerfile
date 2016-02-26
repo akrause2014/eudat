@@ -1,5 +1,4 @@
 ##########################################################################
-ENV IRODSVERSION 4.1.8
 FROM cineca:icat
 MAINTAINER "Amy Krause <a.krause@epcc.ed.ac.uk>"
 
