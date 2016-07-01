@@ -1,0 +1,295 @@
+# EUDAT HTTP API
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "0.0.1"
+  title: EUDAT HTTP API
+  contact:
+    name: EUDAT HTTP API team
+    email: info@eudat.eu
+    url: http://eudat.eu
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0
+host: eudat.epcc.ed.ac.uk
+basePath: /api
+schemes:
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+
+# Describe your paths here
+paths:
+  # This is a path endpoint. Change it.
+  /digitalobjects/:
+    # This is a HTTP operation
+    get:
+      # Describe this verb here. Note: you can use markdown
+      description: |
+        Searches the digital objects.
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        -
+          name: filter
+          in: query
+          description: filter parameters
+          required: false
+          type: array
+          items:
+            type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            title: List of IDs
+            type: array
+            items:
+              title: ID
+              type: object
+              properties:
+                id:
+                  type: string
+    post:
+      description: |
+        Create a digital object
+      produces:
+       - application/json
+      responses:
+        200:
+          description:
+            object was created successfully
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+  /digitalobjects/{id}:
+    get:
+      description: |
+        Returns information about the digital object
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          description: ID of digital object
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+          schema:
+            title: object
+            type: object
+            properties:
+              id:
+                type: string
+              published_by: 
+                type: string
+              files_count:
+                type: integer
+              metadata:
+                title: schemas
+                type: array
+                items:
+                  type: object
+                  properties:
+                    schema:
+                      type: string
+                    fields:
+                      type: object
+
+    patch:
+      description: 
+        Change state of a digital object
+      parameters:
+        - name: id
+          in: path
+          description: ID of digital object
+          required: true
+          type: string
+      responses:
+        200:
+          description: OK
+  /digitalobjects/{id}/entities:
+    # This is a HTTP operation
+    get:
+      # Search for an entity or a set of entities in a Digital Object
+      description: |
+        Search for an entity or a set of entities in a Digital Object.
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        - name: id
+          in: path
+          description: ID of digital object
+          required: true
+          type: string
+        - name: filename
+          in: query
+          description: entity filename
+          required: false
+          type: string
+        - name: recursive
+          in: query
+          description: recursive search
+          required: false
+          type: boolean
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            title: List of IDs
+            type: array
+            items:
+              title: ID
+              type: object
+              properties:
+                id:
+                  type: string
+    post:
+      # add an entity to an existing digital object
+      description: |
+        Add a Digital Entity to a Digital Object.
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        - name: id
+          in: path
+          description: ID of digital object
+          required: true
+          type: string
+        - name: entity-data
+          in: formData
+          description: The entity object data
+          required: true
+          type: file
+          minLength: 1
+          maxLength: 5000000  # ~5MB
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Returns the uploaded entity information
+          schema:
+            properties:
+              id:
+                type: string
+                description: The auto-generated entity id
+              filename:
+                type: string
+                description: The filename of the uploaded entity
+              entity-length:
+                type: integer
+                description: Length of the uploaded entity
+          headers:
+            Location:
+              type: string
+              description: The URL of the newly-added entity
+  /digitalobjects/{parent_id}/entities/{entity_id}:
+    # This is a HTTP operation
+    get:
+      # Retrieve an entity by its id
+      description: |
+        Retrieve an entity file by its id within a parent object.
+      produces:
+        - application/file
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        - name: parent_id
+          in: path
+          description: ID of parent digital object
+          required: true
+          type: string
+        - name: entity_id
+          in: path
+          description: ID of entity digital object
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful response
+          schema:
+            title: message
+            type: string
+    delete:
+      # Delete an entity file
+      description: |
+        Delete an entity file. Deletion is only possible if the Digital Object is in a draft state.
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        - name: parent_id
+          in: path
+          description: ID of parent digital object
+          required: true
+          type: string
+        - name: entity_id
+          in: path
+          description: ID of entity digital object
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful deletion
+          schema:
+            title: response message
+            type: string
+    patch:
+      # Rename an entity file
+      description: |
+        Change the name of an entity file
+      produces:
+        - application/json
+      # This is array of GET operation parameters:
+      parameters:
+        # An example parameter that is in query and is required
+        - name: parent_id
+          in: path
+          description: ID of parent digital object
+          required: true
+          type: string
+        - name: entity_id
+          in: path
+          description: ID of entity digital object
+          required: true
+          type: string
+        - name: filename
+          in: query
+          description: new name for the entity file
+          required: true
+          type: string
+      # Expected responses for this operation:
+      responses:
+        # Response code
+        200:
+          description: Successful update
+          schema:
+            title: response message
+            type: string
+  
+          
+    
