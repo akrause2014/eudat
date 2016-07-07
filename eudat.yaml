@@ -30,6 +30,7 @@ paths:
       # Describe this verb here. Note: you can use markdown
       description: |
         Searches the digital objects.
+      operationId: app.get_digital_objects
       produces:
         - application/json
       # This is array of GET operation parameters:
@@ -60,8 +61,24 @@ paths:
     post:
       description: |
         Create a digital object
+      operationId: app.create_digital_object
       produces:
        - application/json
+      consumes:
+      - application/json
+      parameters:
+        # metadata for the new object
+        - name: metadata
+          in: body
+          description: The object metadata in JSON format
+          required: true
+          schema:
+            type: object
+            properties:
+              schema_id:
+                type: string
+              fields:
+                type: object
       responses:
         200:
           description:
@@ -75,6 +92,7 @@ paths:
     get:
       description: |
         Returns information about the digital object
+      operationId: app.get_digital_object
       produces:
         - application/json
       parameters:
@@ -87,7 +105,7 @@ paths:
         200:
           description: OK
           schema:
-            title: object
+            title: objectdata
             type: object
             properties:
               id:
@@ -97,19 +115,16 @@ paths:
               files_count:
                 type: integer
               metadata:
-                title: schemas
-                type: array
-                items:
-                  type: object
-                  properties:
-                    schema:
-                      type: string
-                    fields:
-                      type: object
-
+                type: object
+                properties:
+                  schema_id:
+                    type: string
+                  fields:
+                    type: object
     patch:
       description: 
         Change state of a digital object
+      operationId: app.update_digital_object
       parameters:
         - name: id
           in: path
@@ -125,6 +140,7 @@ paths:
       # Search for an entity or a set of entities in a Digital Object
       description: |
         Search for an entity or a set of entities in a Digital Object.
+      operationId: app.get_object_entities
       produces:
         - application/json
       # This is array of GET operation parameters:
@@ -163,6 +179,7 @@ paths:
       # add an entity to an existing digital object
       description: |
         Add a Digital Entity to a Digital Object.
+      operationId: app.add_entity_to_object
       consumes:
         - multipart/form-data
       produces:
@@ -208,6 +225,7 @@ paths:
       # Retrieve an entity by its id
       description: |
         Retrieve an entity file by its id within a parent object.
+      operationId: app.get_entity_file
       produces:
         - application/file
       # This is array of GET operation parameters:
@@ -235,6 +253,7 @@ paths:
       # Delete an entity file
       description: |
         Delete an entity file. Deletion is only possible if the Digital Object is in a draft state.
+      operationId: app.delete_entity
       produces:
         - application/json
       # This is array of GET operation parameters:
@@ -262,6 +281,7 @@ paths:
       # Rename an entity file
       description: |
         Change the name of an entity file
+      operationId: app.rename_entity
       produces:
         - application/json
       # This is array of GET operation parameters:
