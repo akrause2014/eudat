@@ -13,6 +13,11 @@ from flask_restful import Resource, Api
 from settings import STORAGE_DIR, METADATA_DIR, DATA_DIR
 import digital_objects as d
 
+STATUS_DRAFT = 'draft'
+STATUS_COMMITTED = 'committed'
+STATUS_PUBLISHED = 'published'
+STATUS_DELETED = 'deleted'
+
 app = Flask(__name__)
 api = Api(app)
 
@@ -28,18 +33,43 @@ class DigitalObjects(Resource):
         object_dir = os.path.join(STORAGE_DIR, object_id)
         md_dir = os.path.join(object_dir, METADATA_DIR)
         metadata = request.get_json()
+        status = STATUS_DRAFT
         with open(os.path.join(md_dir, 'metadata'), 'w') as f:
            json.dump(metadata, f)
+        with open(os.path.join(md_dir, 'status'), 'w') as f:
+           f.write(status)
         return {"id": object_id}
 
 
 class DigitalObject(Resource):
+
     def get(self, object_id):
         with open(os.path.join(d.get_md_dir(object_id), 'metadata')) as f:
             metadata = json.load(f)
+        status = d.get_status(object_id)
         return {"id": object_id, 
                 "metadata": metadata, 
+                "status": status,
                 "files_count": d.count_files(d.get_data_dir(object_id))}
+
+    def patch(self, object_id):
+        body = request.get_json()
+        if 'status' not in body:
+            return {'message' : 'Invalid request: Status expected.'}, 400
+        new_status = body['status']
+        md_dir = d.get_md_dir(object_id)
+        with open(os.path.join(md_dir, 'status'), 'w') as f:
+           f.write(new_status)
+        return {"id": object_id, "status": new_status}
+
+    def delete(self, object_id):
+        status = d.get_status(object_id)
+        if status == STATUS_DRAFT:
+            d.set_status(object_id, STATUS_DELETED)
+            return '', 204
+        else:
+            return {'message': 'Digital object is not in draft status'}, 405
+
 
 
 class DigitalEntities(Resource):
@@ -77,6 +107,7 @@ class DigitalEntity(Resource):
     def delete(self, object_id, entity_id):
         os.remove(os.path.join(d.get_data_dir(object_id), entity_id))
         return '', 204
+
 
 api.add_resource(DigitalObjects, '/digitalobjects')
 api.add_resource(DigitalObject, '/digitalobjects/<object_id>')

@@ -20,6 +20,18 @@ def create_digital_object():
             # if the directory exists or can't be created we try again
             pass
 
+def get_status(object_id):
+    md_dir = get_md_dir(object_id)
+    with open(os.path.join(md_dir, 'status')) as f:
+        return f.read()
+
+
+def set_status(object_id, status):
+    md_dir = get_md_dir(object_id)
+    with open(os.path.join(md_dir, 'status'), 'w') as f:
+        return f.write(status)
+
+
 def get_obj_dir(object_id):
     return os.path.join(STORAGE_DIR, object_id)
     
