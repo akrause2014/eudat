@@ -33,6 +33,8 @@ class DigitalObjects(Resource):
         object_dir = os.path.join(STORAGE_DIR, object_id)
         md_dir = os.path.join(object_dir, METADATA_DIR)
         metadata = request.get_json()
+        if not metadata:
+            metadata = {}
         status = STATUS_DRAFT
         with open(os.path.join(md_dir, 'metadata'), 'w') as f:
            json.dump(metadata, f)
