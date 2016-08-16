@@ -56,7 +56,7 @@ class DigitalObject(Resource):
 
     def patch(self, object_id):
         body = request.get_json()
-        if 'status' not in body:
+        if body is None or 'status' not in body:
             return {'message' : 'Invalid request: Status expected.'}, 400
         new_status = body['status']
         md_dir = d.get_md_dir(object_id)
