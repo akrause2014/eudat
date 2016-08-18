@@ -86,6 +86,9 @@ class DigitalEntity(Resource):
         return send_from_directory(directory=d.get_data_dir(object_id), filename=entity_id)
 
     def delete(self, object_id, entity_id):
+        status = md.get_status(object_id)
+        if status != STATUS_DRAFT:
+            return {'message': 'Digital object is not in draft status'}, 405
         try:
             os.remove(os.path.join(d.get_data_dir(object_id), entity_id))
             md.delete_entity(object_id, entity_id)
