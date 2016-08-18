@@ -32,11 +32,18 @@ def create_object(object_id):
 def store_metadata(object_id, metadata):
     client = MongoClient()
     db = client[MONGODATABASENAME]
-    db.objects.update(
-        {'object_id': object_id},
-        {'object_id': object_id, 'metadata': metadata, 'status': STATUS_DRAFT},
-        upsert=True
-    )        
+
+    result = db.objects.update_one(
+        {"object_id": object_id},
+        {
+            "$set": {'metadata': metadata},
+            "$setOnInsert": 
+                {'object_id': object_id,
+                 'metadata': metadata,
+                 'status': STATUS_DRAFT},
+                 "$currentDate": {"lastModified": True}
+        },
+        upsert=True)
 
 
 # get an object's metadata, or None if the object does not exist

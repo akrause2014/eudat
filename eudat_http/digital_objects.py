@@ -45,8 +45,11 @@ def count_entities(object_id):
 
 
 def list_entities(object_id):
-    return list_files(get_data_dir(object_id))
-
+    data_dir = get_data_dir(object_id)
+    if os.path.isdir(data_dir):
+        return list_files(data_dir)
+    else:
+        return None
 
 
 def get_obj_dir(object_id):

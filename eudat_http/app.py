@@ -58,12 +58,14 @@ class DigitalObject(Resource):
             return {'message': 'Digital object is not in draft status'}, 405
 
 
-
 class DigitalEntities(Resource):
 
     def get(self, object_id):
         result = []
-        for p in d.list_entities(object_id):
+        ents = d.list_entities(object_id)
+        if ents is None:
+            return {'message': 'Digital object not found: %s' % object_id}, 404
+        for p in ents:
             result.append({"id": p})
         return result
 
