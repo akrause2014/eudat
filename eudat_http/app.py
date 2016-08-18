@@ -34,12 +34,16 @@ class DigitalObjects(Resource):
 class DigitalObject(Resource):
 
     def get(self, object_id):
-        metadata = md.get_metadata(object_id)
         status = md.get_status(object_id)
+        if status is None:
+            # object doesn't exist
+            return {'message': 'Digital object not found: %s' % object_id}, 404
+        metadata = md.get_metadata(object_id)
+        files_count = d.count_entities(object_id)
         return {"id": object_id, 
                 "metadata": metadata, 
                 "status": status,
-                "files_count": d.count_entities(object_id)}
+                "files_count": files_count}
 
     def patch(self, object_id):
         body = request.get_json()
