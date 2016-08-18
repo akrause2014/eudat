@@ -90,23 +90,15 @@ def __update_document(object_id, payload):
 def update_entity(entity_id, filename):
     client = MongoClient()
     db = client[MONGODATABASENAME]
-
-     # look for an existing entity
-    document = db.entities.find_one({'entity_id': entity_id})
-
-    # if no entity found then insert a new document with result status
-    if document == None:
-         document = {'entity_id': entity_id, 'filename': filename}
-         db.entities.insert_one(document)
-    else:
-        # update an existing document
-         db.entities.update_one(
-             {"entity_id": entity_id},
-             {
-                "$set": { 'filename': filename},
-                "$currentDate": {"lastModified": True}
-             }
-         )
+    
+    result = db.entities.update_one(
+        {'entity_id': entity_id},
+        {
+            "$set": {'filename': filename},
+            "$setOnInsert": {'entity_id': entity_id, 'filename': filename},
+            "$currentDate": {"lastModified": True}
+        },
+        upsert=True)
 
 # get information about an entity
 def get_entity(entity_id):

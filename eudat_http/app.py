@@ -82,6 +82,7 @@ class DigitalEntity(Resource):
     def delete(self, object_id, entity_id):
         try:
             os.remove(os.path.join(d.get_data_dir(object_id), entity_id))
+            md.delete_entity(object_id, entity_id)
             return '', 204
         except:
             return '', 404

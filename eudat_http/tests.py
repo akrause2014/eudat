@@ -83,3 +83,30 @@ def test_create_entity():
     r = requests.get(entity_url + '/' + entity_id)
     assert r.status_code == 200
     assert r.text == 'Hello World!'
+
+
+def test_create_objects_and_entities():
+    object1_id = _create_object()
+    object2_id = _create_object()
+    entity1_url = objects_url + "/" + object1_id + '/entities'
+    entity2_url = objects_url + "/" + object2_id + '/entities'
+    files = {"file" : ('test.txt', 'Hello World!')}
+    r = requests.post(entity1_url,  files=files)
+    assert r.status_code == 200
+    response = r.json()
+    assert 'id' in response
+    entity1_id = response['id']
+    assert response['length'] == 12
+    assert response['name'] == 'test.txt'
+    assert response['checksum'] == '2ef7bde608ce5404e97d5f042f95f89f1c232871'
+    r = requests.post(entity2_url,  files=files)
+    entity2_id = r.json()['id']
+    r = requests.get(entity1_url)
+    assert r.status_code == 200
+    assert r.json() == [{'id' : entity1_id}]
+    r = requests.get(entity2_url)
+    assert r.status_code == 200
+    assert r.json() == [{'id' : entity2_id}]
+    r = requests.get(entity1_url + '/' + entity1_id)
+    assert r.status_code == 200
+    assert r.text == 'Hello World!'
