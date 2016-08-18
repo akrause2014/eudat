@@ -3,7 +3,7 @@ import uuid
 import hashlib
 
 from settings import STORAGE_DIR, DATA_DIR
-import metadata_file_store as md
+from settings import md_store as md
 
 def create_digital_object():
     for i in range(10): # try up to 10 times to create an id

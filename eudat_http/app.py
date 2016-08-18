@@ -10,12 +10,8 @@ import uuid
 from flask import Flask, request, send_from_directory
 from flask_restful import Resource, Api
 import digital_objects as d
-import metadata_file_store as md
+from settings import md_store as md, STATUS_DRAFT, STATUS_DELETED
 
-STATUS_DRAFT = 'draft'
-STATUS_COMMITTED = 'committed'
-STATUS_PUBLISHED = 'published'
-STATUS_DELETED = 'deleted'
 
 app = Flask(__name__)
 api = Api(app)

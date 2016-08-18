@@ -4,7 +4,7 @@ import os
 import requests
 import shutil
 
-from settings import STORAGE_DIR
+from settings import STORAGE_DIR, md_store as md
 
 
 base_url = "http://localhost:5000/"
@@ -14,11 +14,13 @@ objects_url = base_url + "digitalobjects"
 def setup():
     shutil.rmtree(STORAGE_DIR)
     os.makedirs(STORAGE_DIR)
+    md.clear_metadata()
 
 
 def tearDown():
     shutil.rmtree(STORAGE_DIR)
     os.makedirs(STORAGE_DIR)
+    md.clear_metadata()
 
 
 def _create_object():

@@ -3,6 +3,9 @@ import os
 from settings import STORAGE_DIR, METADATA_DIR
 
 
+def clear_metadata():
+    pass
+
 def create_object(object_id):
     try:
         os.makedirs(get_md_dir(object_id))
