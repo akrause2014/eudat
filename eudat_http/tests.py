@@ -39,11 +39,17 @@ def test_list_objects():
 def test_create_object():
     object_id = _create_object()
     r = requests.get(objects_url)
+    assert r.status_code == 200
     assert r.json() == [{'id' : object_id}]
     object_url = objects_url + "/" + object_id
     r = requests.get(object_url)
     assert r.status_code == 200
     assert r.json()['status'] == 'draft'
+
+
+def test_get_unknown_object():
+    r = requests.get(objects_url + '/xyz_unknown')
+    assert r.status_code == 404
 
 
 def test_change_status():
@@ -83,6 +89,19 @@ def test_create_entity():
     r = requests.get(entity_url + '/' + entity_id)
     assert r.status_code == 200
     assert r.text == 'Hello World!'
+
+
+def test_get_unknown_object_and_entity():
+    # test unknown object and entity
+    r = requests.get(objects_url + '/doesnotexist/entities/xyz_unknown')
+    assert r.status_code == 404
+
+
+def test_get_unknown_entity():
+    # test unknown entity in existing object
+    object_id = _create_object()
+    r = requests.get(objects_url + "/" + object_id + '/entities/xyz_unknown')
+    assert r.status_code == 404
 
 
 def test_create_objects_and_entities():
